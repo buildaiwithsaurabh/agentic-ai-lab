@@ -1,4 +1,4 @@
-# Day 03 - Python Fundamentals
+# Day 06 - Python Fundamentals
 
 ## Overview
 
