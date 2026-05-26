@@ -2,7 +2,7 @@
 
 ## Overview
 
-Day 06 focused on strengthening my understanding of Python function architecture, variable scope, modular programming, encryption logic, and building interactive console-based applications.
+Day 06 focused on strengthening my understanding of Python function architecture, variable scope, modular programming, encryption logic, and building interactive console-based applications. 
 
 Through practical coding exercises and mini projects, I explored how Python handles scope resolution, program execution flow, reusable modules, and real-world logic implementation.
 
