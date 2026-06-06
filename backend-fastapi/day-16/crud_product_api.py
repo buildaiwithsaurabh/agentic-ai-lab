@@ -1,99 +1,129 @@
-# ==========================================
-# CRUD OPERATIONS IN FASTAPI
-# ==========================================
+from fastapi import FastAPI
+from pydantic import BaseModel
 
-# CRUD stands for:
-#
-# C = Create
-# R = Read
-# U = Update
-# D = Delete
-#
-# CRUD operations are used in almost every application.
+app = FastAPI()
 
 
 # ==========================================
-# CREATE
+# PYDANTIC MODEL
 # ==========================================
 
-# Used to create new data.
-#
-# HTTP Method:
-# POST
-#
-# Example:
-#
-# POST /products
+class Product(BaseModel):
+
+    name: str
+    category: str
+    price: float
 
 
 # ==========================================
-# READ
+# TEMPORARY DATABASE
 # ==========================================
 
-# Used to retrieve data.
-#
-# HTTP Method:
-# GET
-#
-# Examples:
-#
-# GET /products
-# GET /products/1
+products = []
 
 
 # ==========================================
-# UPDATE
+# HOME ROUTE
 # ==========================================
 
-# Used to update existing data.
-#
-# HTTP Method:
-# PUT
-#
-# Example:
-#
-# PUT /products/1
+@app.get("/")
+def home():
+
+    return {
+        "message": "CRUD Product API"
+    }
 
 
 # ==========================================
-# DELETE
+# CREATE PRODUCT
 # ==========================================
 
-# Used to remove data.
-#
-# HTTP Method:
-# DELETE
-#
-# Example:
-#
-# DELETE /products/1
+@app.post("/products")
+def create_product(product: Product):
 
+    products.append(product)
 
-# ==========================================
-# CRUD TABLE
-# ==========================================
-
-# Create  -> POST
-# Read    -> GET
-# Update  -> PUT
-# Delete  -> DELETE
+    return {
+        "message": "Product Created Successfully",
+        "product": product
+    }
 
 
 # ==========================================
-# REAL WORLD EXAMPLE
+# GET ALL PRODUCTS
 # ==========================================
 
-# Instagram
+@app.get("/products")
+def get_products():
+
+    return products
+
+
+# ==========================================
+# GET PRODUCT BY ID
+# ==========================================
+
+@app.get("/products/{product_id}")
+def get_product(product_id: int):
+
+    if product_id < len(products):
+
+        return products[product_id]
+
+    return {
+        "error": "Product Not Found"
+    }
+
+
+# ==========================================
+# UPDATE PRODUCT
+# ==========================================
+
+@app.put("/products/{product_id}")
+def update_product(product_id: int, updated_product: Product):
+
+    if product_id < len(products):
+
+        products[product_id] = updated_product
+
+        return {
+            "message": "Product Updated Successfully",
+            "product": updated_product
+        }
+
+    return {
+        "error": "Product Not Found"
+    }
+
+
+# ==========================================
+# DELETE PRODUCT
+# ==========================================
+
+@app.delete("/products/{product_id}")
+def delete_product(product_id: int):
+
+    if product_id < len(products):
+
+        deleted_product = products.pop(product_id)
+
+        return {
+            "message": "Product Deleted Successfully",
+            "product": deleted_product
+        }
+
+    return {
+        "error": "Product Not Found"
+    }
+
+
+# ==========================================
+# RUN PROJECT
+# ==========================================
+
+# uvicorn crud_product_api:app --reload
+
+
+# Swagger Docs:
 #
-# Create Post
-# Read Post
-# Update Post
-# Delete Post
-#
-#
-# Amazon
-#
-# Create Product
-# Read Product
-# Update Product
-# Delete Product
+# http://127.0.0.1:8000/docs
