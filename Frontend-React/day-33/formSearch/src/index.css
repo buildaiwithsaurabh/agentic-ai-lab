@@ -1,0 +1,43 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
+}
+
+.container {
+  text-align: center;
+  padding: 40px;
+}
+
+.card {
+  width: 600px;
+  margin: auto;
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+input {
+  width: 70%;
+  padding: 10px;
+  margin: 10px 0;
+}
+
+button {
+  padding: 10px 15px;
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+ul {
+  text-align: left;
+}
+
+li {
+  margin: 8px 0;
+}
+
+hr {
+  margin: 25px 0;
+}
