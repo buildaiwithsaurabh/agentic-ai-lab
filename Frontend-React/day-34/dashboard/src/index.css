@@ -1,0 +1,32 @@
+body {
+  margin: 0;
+  background: #f4f4f4;
+  font-family: Arial, sans-serif;
+}
+
+.container {
+  padding: 30px;
+}
+
+.container h1 {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px,1fr));
+  gap: 20px;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 3px 10px rgba(0,0,0,.1);
+}
+
+.status {
+  text-align: center;
+  margin-top: 80px;
+}
