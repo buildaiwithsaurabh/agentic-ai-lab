@@ -1,0 +1,263 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f5f7fb;
+  color: #222;
+}
+
+/* ===========================
+Navbar
+=========================== */
+
+.navbar {
+
+  background: #111827;
+  color: white;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 20px 60px;
+
+  box-shadow: 0 5px 10px rgba(0, 0, 0, .15);
+
+}
+
+.logo h2 {
+  font-size: 28px;
+}
+
+.logo p {
+  font-size: 14px;
+  color: #d1d5db;
+  margin-top: 5px;
+}
+
+.nav-links {
+
+  display: flex;
+  gap: 30px;
+
+}
+
+.nav-links a {
+
+  color: white;
+  text-decoration: none;
+  transition: .3s;
+
+}
+
+.nav-links a:hover {
+
+  color: #60a5fa;
+
+}
+
+/* ===========================
+Home
+=========================== */
+
+.container {
+
+  width: 90%;
+  margin: auto;
+  padding: 50px 0;
+
+}
+
+.hero {
+
+  text-align: center;
+  margin-bottom: 60px;
+
+}
+
+.hero h1 {
+
+  font-size: 48px;
+  margin-bottom: 20px;
+
+}
+
+.hero p {
+
+  font-size: 18px;
+  color: #555;
+  line-height: 1.6;
+
+}
+
+.button {
+
+  display: inline-block;
+
+  margin-top: 30px;
+
+  background: #2563eb;
+  color: white;
+
+  padding: 15px 25px;
+
+  text-decoration: none;
+
+  border-radius: 8px;
+
+}
+
+/* ===========================
+Developer Cards
+=========================== */
+
+.grid {
+
+  display: grid;
+  grid-template-columns:
+    repeat(auto-fit, minmax(320px, 1fr));
+
+  gap: 25px;
+
+}
+
+.card {
+
+  background: white;
+
+  padding: 25px;
+
+  border-radius: 15px;
+
+  box-shadow: 0 5px 15px rgba(0, 0, 0, .08);
+
+}
+
+.card img {
+
+  width: 100px;
+  height: 100px;
+
+  border-radius: 50%;
+
+  object-fit: cover;
+
+  margin-bottom: 20px;
+
+}
+
+.card h2 {
+
+  margin-bottom: 10px;
+
+}
+
+.card h3 {
+
+  color: #2563eb;
+
+  margin-bottom: 15px;
+
+}
+
+.skills {
+
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+
+  margin: 20px 0;
+
+}
+
+.skill {
+
+  background: #2563eb;
+  color: white;
+
+  padding: 6px 12px;
+
+  border-radius: 20px;
+
+  font-size: 13px;
+
+}
+
+.btn {
+
+  display: inline-block;
+
+  margin-top: 20px;
+
+  background: #111827;
+  color: white;
+
+  text-decoration: none;
+
+  padding: 12px 20px;
+
+  border-radius: 8px;
+
+}
+
+/* ===========================
+Details
+=========================== */
+
+.details {
+
+  background: white;
+
+  padding: 40px;
+
+  border-radius: 15px;
+
+  box-shadow: 0 5px 15px rgba(0, 0, 0, .08);
+
+}
+
+.details img {
+
+  width: 180px;
+
+  border-radius: 50%;
+
+  margin-bottom: 25px;
+
+}
+
+/* ===========================
+Responsive
+=========================== */
+
+@media(max-width:768px) {
+
+  .navbar {
+
+    flex-direction: column;
+
+    gap: 20px;
+
+    padding: 25px;
+
+  }
+
+  .nav-links {
+
+    flex-direction: column;
+
+    text-align: center;
+
+  }
+
+  .hero h1 {
+
+    font-size: 34px;
+
+  }
+
+}
