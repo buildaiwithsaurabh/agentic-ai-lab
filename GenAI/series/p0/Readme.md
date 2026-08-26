@@ -1,282 +1,168 @@
-# 🌐 Web Research Agent
+# 🧠 GenAI & RAG Foundations (Series P0)
 
-A professional **AI-powered web research assistant** built with **Streamlit, LangChain, LangGraph, and Groq**. The application can maintain conversational context and use web search to retrieve current information before generating responses.
-
-The project demonstrates how to build a practical **agentic AI application** where an LLM can dynamically decide when to use external tools instead of relying solely on its internal knowledge.
+A comprehensive hands-on repository covering **Retrieval-Augmented Generation (RAG) pipelines**, **LangChain document processing**, **Vector Embeddings**, **Chroma Vector Database**, and **Agentic AI Workflows**.
 
 ---
 
-## ✨ Features
+## 📌 RAG Pipeline Overview
 
-* 🤖 **AI Research Agent** powered by Groq LLM
-* 🔍 **Web Search Integration** for current and up-to-date information
-* 🧠 **Conversational Memory** using LangGraph's `MemorySaver`
-* 💬 **Interactive Chat Interface** built with Streamlit
-* ⚡ **Streaming Responses** for a real-time user experience
-* 🛠️ **Custom LangChain Tool** for web search
-* 🔄 **Persistent Conversation Thread** during the user session
-* 🧹 **Clean Tool Handling** that hides raw tool outputs from users
-
----
-
-## 🏗️ Architecture
-
-The application follows an **Agent + Tool + Memory** architecture:
+Retrieval-Augmented Generation (RAG) enhances LLMs by connecting them to external knowledge sources. This repository breaks down the full RAG lifecycle into modular, executable Jupyter Notebooks:
 
 ```text
-User
-  │
-  ▼
-Streamlit Chat Interface
-  │
-  ▼
-LangChain Agent
-  │
-  ├──────────────► Groq LLM
-  │
-  ├──────────────► Web Search Tool
-  │
-  ▼
-LangGraph Memory Checkpointer
-  │
-  ▼
-Streaming Response to User
+┌────────────────┐     ┌──────────────────────┐     ┌────────────────────────┐
+│  Data Ingestion│ ──► │  Text Chunking       │ ──► │  Vector Embeddings     │
+│  (Doc Loader)  │     │  (Doc Splitter)      │     │  (Gemini Embeddings)   │
+└────────────────┘     └──────────────────────┘     └────────────────────────┘
+                                                                │
+                                                                ▼
+┌────────────────┐     ┌──────────────────────┐     ┌────────────────────────┐
+│ Final Context  │ ◄── │  Similarity Search   │ ◄── │  Vector Storage        │
+│ & LLM Response │     │  (Chroma Retrieval)  │     │  (Chroma DB)           │
+└────────────────┘     └──────────────────────┘     └────────────────────────┘
 ```
 
-### How It Works
+---
 
-1. The user submits a question through the Streamlit chat interface.
-2. The query is sent to the LangChain agent.
-3. The LLM analyzes the request and determines whether web search is required.
-4. For current or time-sensitive information, the agent calls the `web_search` tool.
-5. Search results are provided back to the LLM.
-6. The LLM generates a natural-language response.
-7. The response is streamed to the Streamlit interface.
-8. LangGraph memory maintains the conversation state using a unique thread ID.
+## 📚 Completed RAG Modules
+
+### 1. 📄 Document Ingestion (`Notebook/RAG_Doc_Loader.ipynb`)
+Demonstrates how to extract and load data from heterogeneous sources into standard LangChain `Document` objects:
+* **`TextLoader`**: Loads local unstructured files (e.g., `data/DBE.txt`) with custom encoding (`utf-8`).
+* **`WebBaseLoader`**: Scrapes dynamic online articles and web pages using `BeautifulSoup4`.
+* **`WikipediaLoader`**: Directly queries Wikipedia topics (e.g., *"Generative Artificial Intelligence"*) to extract structured background data.
+
+```python
+from langchain_community.document_loaders import TextLoader, WebBaseLoader, WikipediaLoader
+
+# Example: Loading local text document
+loader = TextLoader("../data/DBE.txt", encoding="utf-8")
+documents = loader.load()
+```
 
 ---
 
-## 🛠️ Tech Stack
+### 2. ✂️ Text Splitting & Chunking (`Notebook/RAG_Doc_Splitter.ipynb`)
+Handles intelligent text segmentation to fit LLM context windows while preserving semantic context:
+* **`RecursiveCharacterTextSplitter`**: Recursively splits by paragraphs (`\n\n`), lines (`\n`), and spaces (` `) to keep sentences intact.
+* **Configurable Parameters**:
+  * `chunk_size`: Maximum character count per chunk (e.g., `1000`).
+  * `chunk_overlap`: Overlap between consecutive chunks (e.g., `200`) to prevent context slicing at borders.
+* **Document Chunking**: Preserves source metadata (file path, tags) across all split chunk objects.
 
-| Technology          | Purpose                                  |
-| ------------------- | ---------------------------------------- |
-| **Python**          | Core programming language                |
-| **Streamlit**       | Web interface                            |
-| **LangChain**       | Agent and tool orchestration             |
-| **LangGraph**       | Conversation memory and state management |
-| **Groq**            | High-speed LLM inference                 |
-| **Serpdive Search** | Web search capability                    |
-| **Python-dotenv**   | Environment variable management          |
+```python
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+text_chunks = splitter.split_documents(documents)
+```
 
 ---
 
-## 📁 Project Structure
+### 3. 🔮 Embeddings & Vector Database (`Notebook/RAG_Vector.ipynb`)
+Converts split text into high-dimensional semantic representations and stores them for instant retrieval:
+* **Google Gemini Embeddings**: Uses `GoogleGenerativeAIEmbeddings` with the `gemini-embedding-2-preview` model (producing **3,072-dimensional** vector embeddings).
+* **Chroma Vector Store**: Vector database instance persisted locally to `./vector_db` using `langchain_chroma`.
+* **Similarity Search**: Performs top-k vector cosine/Euclidean similarity queries (`k=2`) to fetch relevant text chunks based on user prompts.
+
+```python
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
+from langchain_chroma import Chroma
+
+# Generate Embeddings & Store in Chroma DB
+embeddings = GoogleGenerativeAIEmbeddings(model="gemini-embedding-2-preview")
+vector_store = Chroma.from_texts(
+    texts=documents,
+    embedding=embeddings,
+    persist_directory="./vector_db"
+)
+
+# Querying the Vector Database
+query = "semantic meaning"
+results = vector_store.similarity_search(query=query, k=2)
+```
+
+---
+
+## 📁 Repository Structure
 
 ```text
-web-research-agent/
+GenAI/series/p0/
 │
-├── app.py                 # Main Streamlit application
-├── .env                   # Environment variables
-├── .gitignore             # Files excluded from Git
-├── requirements.txt       # Project dependencies
-└── README.md              # Project documentation
+├── Notebook/
+│   ├── RAG_Doc_Loader.ipynb         # Document Loading (Text, Web, Wikipedia)
+│   ├── RAG_Doc_Splitter.ipynb       # Chunking with RecursiveCharacterTextSplitter
+│   ├── RAG_Vector.ipynb             # Gemini Embeddings, Chroma DB & Querying
+│   ├── basic_agents.ipynb           # Intro to AI Agents
+│   ├── basic_langchain_with_openai.ipynb # LangChain Open AI Basics
+│   ├── groq_langchain.ipynb         # Groq LLM Inference
+│   ├── search_agent.ipynb           # Streamlit & LangGraph Search Agent
+│   └── vector_db/                   # Local Chroma Vector Database Store
+│
+├── data/
+│   └── DBE.txt                      # Sample dataset for RAG processing
+│
+├── app/                             # Web research agent app
+├── .env                             # Environment variables (API Keys)
+├── .gitignore                       # Ignored files & environment binaries
+├── requirements.txt                 # Project python dependencies
+└── Readme.md                        # Project documentation
 ```
 
 ---
 
-## ⚙️ Installation
+## 🛠️ Tech Stack & Dependencies
 
-### 1. Clone the Repository
+| Category | Component / Library | Purpose |
+| :--- | :--- | :--- |
+| **Language & Environment** | Python 3.13 / `.venv` | Execution environment |
+| **Framework** | `langchain` & `langchain-community` | Pipeline orchestration & integrations |
+| **Text Processing** | `langchain-text-splitters` | Chunking & text segmentation |
+| **Embeddings** | `langchain-google-genai` | Google Gemini vector embeddings (`gemini-embedding-2-preview`) |
+| **Vector Storage** | `langchain-chroma` | Persistent vector database (`Chroma`) |
+| **Web Data Scrapers** | `beautifulsoup4`, `wikipedia` | Ingesting external web data |
+| **Agent / UI** | `streamlit`, `langgraph` | Interactive user interfaces & state memory |
+| **Env Management** | `python-dotenv` | Secure API key handling |
 
-```bash
-git clone <your-repository-url>
-cd web-research-agent
-```
+---
 
-### 2. Create a Virtual Environment
+## ⚙️ Setup & Installation
 
-**Windows:**
-
-```bash
-python -m venv venv
-venv\Scripts\activate
-```
-
-**macOS/Linux:**
-
-```bash
-python -m venv venv
-source venv/bin/activate
-```
-
-### 3. Install Dependencies
+### 1. Environment Setup
 
 ```bash
+# Navigate to project directory
+cd GenAI/series/p0
+
+# Activate Virtual Environment (Windows)
+.venv\Scripts\activate
+
+# Install Dependencies
 pip install -r requirements.txt
 ```
 
----
+### 2. Configure API Keys
 
-## 🔐 Environment Variables
-
-Create a `.env` file in the root directory of the project.
+Create a `.env` file in `GenAI/series/p0/`:
 
 ```env
+GOOGLE_API_KEY=your_google_gemini_api_key
 GROQ_API_KEY=your_groq_api_key
+OPENAI_API_KEY=your_openai_api_key
 ```
 
-Add any additional API keys required by your configured search provider.
+### 3. Running Notebooks
 
-> **Security Note:** Never commit your `.env` file or API keys to a public GitHub repository.
-
-Add the following to `.gitignore`:
-
-```text
-.env
-venv/
-__pycache__/
-```
-
----
-
-## ▶️ Running the Application
-
-Start the Streamlit application with:
+Launch Jupyter Lab or Jupyter Notebook:
 
 ```bash
-streamlit run app.py
+jupyter notebook
 ```
 
-The application will open in your browser, typically at:
-
-```text
-http://localhost:8501
-```
+Navigate to `Notebook/` and run `RAG_Doc_Loader.ipynb`, `RAG_Doc_Splitter.ipynb`, and `RAG_Vector.ipynb` sequentially.
 
 ---
 
-## 🧠 Agent Behavior
+## 👨‍💻 Author & Acknowledgments
 
-The agent is configured with a system prompt that defines its role as a **web research agent**.
-
-For questions involving:
-
-* Current events
-* Recent news
-* Live information
-* Information that may have changed over time
-
-the agent is instructed to use the web search tool before generating an answer.
-
-This approach helps reduce the risk of providing outdated information and demonstrates an important principle in **agentic AI systems: tool augmentation for knowledge beyond the model's static training data**.
-
----
-
-## 🔍 Custom Web Search Tool
-
-The project wraps the search functionality inside a LangChain tool:
-
-```python
-@tool
-def web_search(query: str) -> str:
-    """Search the web for current and up-to-date information."""
-    return search.run(query)
-```
-
-This allows the AI agent to invoke web search dynamically based on the user's query.
-
----
-
-## 🧠 Conversation Memory
-
-Conversation state is managed using LangGraph's `MemorySaver`.
-
-```python
-if "memory" not in st.session_state:
-    st.session_state.memory = MemorySaver()
-```
-
-Each conversation uses a configurable thread ID:
-
-```python
-config = {
-    "configurable": {
-        "thread_id": "user_1"
-    }
-}
-```
-
-This architecture makes it possible to extend the application later with:
-
-* Multiple users
-* Persistent database-backed memory
-* Authentication
-* User-specific conversation threads
-* Long-term memory systems
-
----
-
-## 📡 Streaming Responses
-
-The application uses streaming to display responses progressively rather than waiting for the complete response.
-
-Only AI-generated content is displayed to the user, while internal tool outputs remain hidden.
-
-This provides a cleaner and more responsive chat experience.
-
----
-
-## 🚀 Future Improvements
-
-Potential improvements for the project include:
-
-* [ ] Add source links and citations
-* [ ] Support multiple search providers
-* [ ] Add authentication and user management
-* [ ] Store conversations in a database
-* [ ] Add chat history management
-* [ ] Implement follow-up research capabilities
-* [ ] Add document upload and RAG support
-* [ ] Add research report generation
-* [ ] Add agent observability and tracing
-* [ ] Deploy the application to Streamlit Cloud or another cloud platform
-
----
-
-## 🎯 Learning Outcomes
-
-This project demonstrates practical understanding of:
-
-* Building AI agents with LangChain
-* Tool calling and agent workflows
-* Integrating LLMs with external data sources
-* Managing conversational state with LangGraph
-* Streaming LLM responses
-* Building AI applications with Streamlit
-* Managing API keys securely using environment variables
-
----
-
-## ⚠️ Important Note
-
-Web search results may contain incomplete or inaccurate information. The agent's responses should therefore be treated as research assistance rather than a replacement for verifying critical information from authoritative sources.
-
----
-
-## 📄 License
-
-This project is intended for educational and portfolio purposes. You may add an appropriate open-source license, such as the MIT License, if you plan to make the repository publicly available.
-
----
-
-## 👨‍💻 Author
-
-**Saurabh Kumara**
-
-Built as a hands-on project for learning **Generative AI, AI Agents, LangChain, LangGraph, and LLM application development**.
-
----
-
-### ⭐ If You Found This Project Useful
-
-Consider giving the repository a star and sharing your feedback!
+**Saurabh Kumar**  
+Built as part of the **Agentic AI & GenAI Lab** series exploring RAG, Vector Databases, and Agentic Systems.
